@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -12,26 +13,48 @@ type Token struct {
 	Value string `json:"value"`
 }
 
-var tokenPatterns = map[string]string{
-	"keyword":     `\b(int|float|char|return|if|else|while|for|switch)\b`,
-	"identifier":  `\b[a-zA-Z_][a-zA-Z0-9_]*\b`,
-	"number":      `\b\d+(\.\d+)?\b`,
-	"operator":    `[+\-*/=<>!&|]+`,
-	"punctuation": `[{}()\[\],;]`,
-	"string":      `"(\\.|[^"])*"`,
-	"comment":     `//.*|/\*.*?\*/`,
+type RDXBlob struct {
+	Tokens []Token
 }
 
-func tokenize(input string) []Token {
+var tokenPatterns = map[string]*regexp.Regexp{
+	// Matches Markdown headers (ATX-style and setext-style)
+	"header":       regexp.MustCompile(`(?m)^(#{1,6})\s*(.+?)\s*(#*)$|^(.+)\n([=-]+)$`),
+	"bold":         regexp.MustCompile(`\*\*(.+?)\*\*`),  // todo: fix
+	"italic":       regexp.MustCompile(`\*(.+?)\*`), // todo: fix
+	"code":         regexp.MustCompile("`([^`]*)`"),
+	"link":         regexp.MustCompile(`\[(.*?)\]\((.*?)\)`),
+	"unordered":    regexp.MustCompile(`(?m)^\s*[-*+]\s+(.+)$`),
+	"ordered":      regexp.MustCompile(`(?m)^\s*\d+\.\s+(.+)$`),
+	"blockquote":   regexp.MustCompile(`(?m)^>\s+(.+)$`),
+	"horizontal":   regexp.MustCompile(`(?m)^-{3,}$`),
+}
+
+// Tokenize splits a CommonMark file content into an RDXBlob
+func tokenize(input string) (*RDXBlob, error) {
+	if len(input) == 0 {
+		return nil, errors.New("empty input")
+	}
+
 	var tokens []Token
-	for tokenType, pattern := range tokenPatterns {
-		re := regexp.MustCompile(pattern)
-		matches := re.FindAllString(input, -1)
+	for typ, pattern := range tokenPatterns {
+		matches := pattern.FindAllStringSubmatch(input, -1)
 		for _, match := range matches {
-			tokens = append(tokens, Token{Type: tokenType, Value: match})
+			if typ == "header" {
+				if len(match) > 2 {	
+					tokens = append(tokens, Token{Type: typ, Value: match[2]})
+				}
+			} else if len(match) > 1 {
+				tokens = append(tokens, Token{Type: typ, Value: match[1]})
+			}
 		}
 	}
-	return tokens
+
+	if len(tokens) == 0 {
+		return nil, errors.New("no valid tokens found")
+	}
+
+	return &RDXBlob{Tokens: tokens}, nil
 }
 
 
@@ -50,13 +73,18 @@ func main() {
 		return
 	}
 
-	tokens := tokenize(string(data))
-	output, err := json.MarshalIndent(tokens, "", "  ")
+	rdxBlob, err := tokenize(string(data))
+	if err != nil {
+		fmt.Println("Error tokenizing input:", err)
+		return
+	}
+
+	// Convert the RDXBlob to JSON
+	output, err := json.MarshalIndent(rdxBlob, "", "  ")
 	if err != nil {
 		fmt.Println("Error encoding JSON:", err)
 		return
 	}
 
 	fmt.Println(string(output))
-
 }

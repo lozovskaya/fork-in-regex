@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -92,6 +93,13 @@ func main() {
 	}
 
 	filename := os.Args[1]
+
+	file_extension := strings.ToLower(strings.TrimPrefix(filepath.Ext(filename), "."))
+	if file_extension != "md" {
+		fmt.Println("Error: The file must be a markdown file with .md extension.")
+		return
+	}
+	
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		fmt.Println("Error reading file:", err)

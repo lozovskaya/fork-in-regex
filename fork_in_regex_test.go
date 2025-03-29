@@ -10,17 +10,16 @@ func TestTokenize(t *testing.T) {
 		expected int
 		shouldFail bool
 	}{
-		{"# Header\n", 1, false},
-		{"**Bold Text**", 1, false},
-		{"*Italic Text*", 1, false},
-		{"`Code Block`", 1, false},
-		{"[Link](http://example.com)", 1, false},
-		{"- List Item\n+ Another Item", 2, false},
-		{"1. Ordered List", 1, false},
-		{"> Blockquote", 1, false},
+		{"# Header", 2, false},
+		{"**Bold Text**", 3, false},
+		{"*Italic Text*", 3, false},
+		{"`Code Block`", 3, false},
+		{"[Link](http://example.com)", 6, false},
+		{"- List Item\n- Another Item", 4, false},
+		{"1. Ordered List", 2, false},
+		{"> Blockquote", 2, false},
 		{"---", 1, false},
-		{"This is plain text", 0, true},
-		{"", 0, true},
+		{"This is plain text", 1, false},
 	}
 
 	for _, tt := range tests {

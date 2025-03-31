@@ -7,18 +7,10 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"github.com/lozovskaya/go-commonmark"
 )
 
 type TokenType int
-
-type Token struct {
-	Type  string `json:"type"`
-	Value string `json:"value"`
-}
-
-type RDXBlob struct {
-	Tokens []Token
-}
 
 func cleanText(text string) string {
 	text = strings.ReplaceAll(text, "\r\n", "\n")
@@ -99,18 +91,23 @@ func main() {
 		fmt.Println("Error: The file must be a markdown file with .md extension.")
 		return
 	}
-	
+
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return
 	}
 
-	rdxBlob, err := tokenize(string(data))
-	if err != nil {
-		fmt.Println("Error tokenizing input:", err)
-		return
-	}
+	blocks, refMap := commonmark.Parse(data)
+	
+	// Convert the parsed blocks and refMap into RDXBlob
+    rdxBlob := RenderRDX(blocks, refMap)
+
+	// rdxBlob, err := tokenize(string(data))
+	// if err != nil {
+	// 	fmt.Println("Error tokenizing input:", err)
+	// 	return
+	// }
 
 	// Convert the RDXBlob to JSON
 	output, err := json.MarshalIndent(rdxBlob, "", "  ")

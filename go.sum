@@ -1,0 +1,8 @@
+github.com/lozovskaya/go-commonmark v0.0.0-20250331144445-d4a815dfe363 h1:E7hjCnMod8nuxNHYJiE0p7wC+4mcqKdvDUEnz3/Fsbo=
+github.com/lozovskaya/go-commonmark v0.0.0-20250331144445-d4a815dfe363/go.mod h1:TpclzDHA2R6BWNOxz1OVpIdGIwtXFVfLUHWUcx44CTI=
+golang.org/x/text v0.9.0 h1:2sjJmO8cDvYveuX97RDLsxlyUxLl+GHoLxBiRdHllBE=
+golang.org/x/text v0.9.0/go.mod h1:e1OnstbJyHTd6l/uOt8jFFHp6TRDWZR/bV3emEE/zU8=
+golang.org/x/text v0.23.0 h1:D71I7dUrlY+VX0gQShAThNGHFxZ13dGLBHQLVl1mJlY=
+golang.org/x/text v0.23.0/go.mod h1:/BLNzu4aZCJ1+kcD0DNRotWKage4q2rGVAg4o22unh4=
+zombiezen.com/go/commonmark v0.2.0 h1:tFIKpVgFA1JzPqAIb2JUfSp11P7EqIllfpGbDLFfX4M=
+zombiezen.com/go/commonmark v0.2.0/go.mod h1:E5X26iJ4BljIzhfJdzFENcBeMDq69ss8s45/S4UQuvA=
